@@ -126,18 +126,16 @@ contexts:
         - include: cleanup
   cleanup:
     - include: comments
-    - include: comments_doxy
     - include: constants_numeric
     - include: strings
     - include: attribute_list
     - include: syntax_highlighting
   comments:
     - include: psl
-    - match: '(--).*$\n?'
+    - match: '(--[^!]).*$\n?'
       scope: comment.line.double-dash.vhdl
       captures:
         1: punctuation.definition.comment.vhdl
-  comments_doxy:
     # Doxygen looks for --! comments, the scope can be used to distinguish
     # normal and doxy commtents.
     - match: '(--!).*$\n?'
