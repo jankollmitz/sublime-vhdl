@@ -2,13 +2,10 @@
 ---
 # http://www.sublimetext.com/docs/3/syntax.html
 name: VHDL
-comment: VHDL Bundle by Brian Padalino (ocnqnyvab@tznvy.pbz)
-file_extensions:
-  - vhd
-  - vhdl
-  - vho
-  - vht
+file_extensions: [vhd, vhdl, vho, vht]
 scope: source.vhdl
+variables:
+  id: '[a-zA-z][a-zA-z0-9_]*'
 contexts:
   main:
     - include: block_processing
@@ -16,19 +13,14 @@ contexts:
   architecture_pattern:
     - match: |-
         (?x)
-
-                    # The word architecture $1
-                    \b((?i:architecture))\s+
-
-                    # Followed up by a valid $3 or invalid identifier $4
-                    (([a-zA-z][a-zA-z0-9_]*)|(.+))(?=\s)\s+
-
-                    # The word of $5
-                    ((?i:of))\s+
-
-                    # Followed by a valid $7 or invalid identifier $8
-                    (([a-zA-Z][a-zA-Z0-9_]*)|(.+?))(?=\s*(?i:is))\b
-
+            # The word architecture $1
+            \b((?i:architecture))\s+
+            # Followed up by a valid $3 or invalid identifier $4
+            (({{id}})|(.+))(?=\s)\s+
+            # The word of $5
+            ((?i:of))\s+
+            # Followed by a valid $7 or invalid identifier $8
+            (({{id}})|(.+?))(?=\s*(?i:is))\b
       captures:
         1: keyword.language.vhdl
         3: entity.name.type.architecture.begin.vhdl
@@ -40,18 +32,14 @@ contexts:
         - meta_scope: meta.block.architecture
         - match: |-
             (?x)
-                        # The word end $1
-                        \b((?i:end))
-
-                        # Optional word architecture $3
-                        (\s+((?i:architecture)))?
-
-                        # Optional same identifier $6 or illegal identifier $7
-                        (\s+((\3)|(.+?)))?
-
-                        # This will cause the previous to capture until just before the ; or $
-                        (?=\s*;)
-
+                # The word end $1
+                \b((?i:end))
+                # Optional word architecture $3
+                (\s+((?i:architecture)))?
+                # Optional same identifier $6 or illegal identifier $7
+                (\s+((\3)|(.+?)))?
+                # This will cause the previous to capture until just before the ; or $
+                (?=\s*;)
           captures:
             1: keyword.language.vhdl
             3: keyword.language.vhdl
@@ -64,11 +52,14 @@ contexts:
         - include: if_pattern
         - include: process_pattern
         - include: type_pattern
+        - include: constant_pattern
+        - include: signal_pattern
         - include: record_pattern
         - include: for_pattern
         - include: entity_instantiation_pattern
         - include: component_instantiation_pattern
         - include: cleanup
+        - include: tag_pattern
   attribute_list:
     - match: \'\(
       captures:
@@ -95,7 +86,7 @@ contexts:
                     # Optional identifier ... $3 or invalid identifier $4
                     (
                       (
-                         ([a-zA-Z][a-zA-Z0-9_]*)
+                         ({{id}})
                         |(.+?)
                       )
                       \s*:\s*
@@ -141,13 +132,18 @@ contexts:
     - include: attribute_list
     - include: syntax_highlighting
   comments:
-    - match: '--[^!].*$\n?'
+    - include: psl
+    - match: '(--).*$\n?'
       scope: comment.line.double-dash.vhdl
+      captures:
+        1: punctuation.definition.comment.vhdl
   comments_doxy:
     # Doxygen looks for --! comments, the scope can be used to distinguish
     # normal and doxy commtents.
-    - match: '--!.*$\n?'
+    - match: '(--!).*$\n?'
       scope: comment.line.double-dash-bang.vhdl
+      captures:
+        1: punctuation.definition.comment.vhdl
   component_instantiation_pattern:
     - match: |-
         (?x)
@@ -155,13 +151,13 @@ contexts:
                     ^\s*
 
                     # Match a valid identifier $1
-                    ([a-zA-Z][a-zA-Z0-9_]*)
+                    ({{id}})
 
                     # Colon! $2
                     \s*(:)\s*
 
                     # Another valid identifier $3
-                    ([a-zA-Z][a-zA-Z0-9_]*)\b
+                    ({{id}})\b
 
                     # Make sure we are just the other word, or the beginning of
                     # a generic or port mapping
@@ -177,7 +173,7 @@ contexts:
           captures:
             0: punctuation.vhdl
           pop: true
-        - include: parenthetical_list
+        - include: parenthetical_list_portmap
         - include: cleanup
   component_pattern:
     - match: |-
@@ -253,7 +249,7 @@ contexts:
                     ^\s*
 
                     # Component identifier or illegal identifier $1
-                    ([a-zA-Z][a-zA-Z0-9_]*)
+                    ({{id}})
 
                     # Colon! $2
                     \s*(:)\s*
@@ -266,12 +262,12 @@ contexts:
 
                     # Optional library unit identifier $8 for invalid identifier $9 followed by a dot $10
                     (
-                      (([a-zA-Z][a-zA-Z0-9_]*)|(.+?))
+                      (({{id}})|(.+?))
                       (\.)
                     )?
 
                     # Entity name reference $12 or illegal identifier $13
-                    (([a-zA-Z][a-zA-Z0-9_]*)|(.+?))
+                    (({{id}})|(.+?))
 
                     # Check to see if we are being followed by either open paren, end of line, or port or generic words
                     (?=\s*(\(|$|(?i:port|generic)))
@@ -282,7 +278,7 @@ contexts:
                       \s*(\()\s*
 
                       # Arch identifier $18 or invalid identifier $19
-                      (([a-zA-Z][a-zA-Z0-9_]*)|(.+?))(?=\s*\))
+                      (({{id}})|(.+?))(?=\s*\))
 
                       # Close paren $21
                       \s*(\))
@@ -308,7 +304,7 @@ contexts:
           captures:
             0: punctuation.vhdl
           pop: true
-        - include: parenthetical_list
+        - include: parenthetical_list_portmap
         - include: cleanup
   entity_pattern:
     - match: |-
@@ -360,7 +356,7 @@ contexts:
                     ^\s*
                     (
                       # Check for an identifier $2
-                      ([a-zA-Z][a-zA-Z0-9_]*)
+                      ({{id}})
 
                       # Followed by a colon $3
                       \s*(:)\s*
@@ -416,37 +412,36 @@ contexts:
   function_definition_pattern:
     - match: |-
         (?x)
-                    # From the beginning of the line
-                    ^\s*
-
-                    # The word function $1
-                    ((?i:function))\s+
-
-                    (
-                      # A valid normal identifier $3
-                       ([a-zA-Z][a-zA-Z\d_]*)
-                      # A valid string quoted identifier $4
-                      |("\S+")
-                      # A valid backslash escaped identifier $5
-                      |(\\.+\\)
-                      # An invalid identifier $5
-                      |(.+?)
-                    )
-
-                    # Check to make sure we have a list or we return
-                    (?=\s*
-                      (
-                         \(
-                        |(?i:\breturn\b)
-                      )
-                    )
-
+          # From the beginning of the line
+          ^\s*
+          # Optionnal impure keyword
+          (?:((?i:impure))\s+)?
+          # The word function
+          ((?i:function))\s+
+          (
+            # A valid normal identifier
+             ([a-zA-Z][a-zA-Z\d_]*)
+            # A valid string quoted identifier
+            |("\S+")
+            # A valid backslash escaped identifier
+            |(\\.+\\)
+            # An invalid identifier
+            |(.+?)
+          )
+          # Check to make sure we have a list or we return
+          (?=\s*
+            (
+               \(
+              |(?i:\breturn\b)
+            )
+          )
       captures:
         1: keyword.language.vhdl
-        3: entity.name.function.function.begin.vhdl
+        2: keyword.language.vhdl
         4: entity.name.function.function.begin.vhdl
         5: entity.name.function.function.begin.vhdl
-        6: invalid.illegal.invalid.identifier.vhdl
+        6: entity.name.function.function.begin.vhdl
+        7: invalid.illegal.invalid.identifier.vhdl
       push:
         - meta_scope: meta.block.function_definition.vhdl
         - match: |-
@@ -475,6 +470,8 @@ contexts:
         - include: control_patterns
         - include: parenthetical_list
         - include: type_pattern
+        - include: signal_pattern
+        - include: constant_pattern
         - include: record_pattern
         - include: cleanup
   function_prototype_pattern:
@@ -539,20 +536,39 @@ contexts:
             0: punctuation.vhdl
           pop: true
         - include: parenthetical_list
+  hierarchical_pattern:
+    - match: (?i)(<<)\s*(signal)\b
+      captures:
+        1: keyword.operator.access.start.vhdl
+        2: keyword.language.vhdl
+      push :
+        - meta_scope: meta.block.hierarchical_access.vhdl
+        - match: (:)\s*(\w+)\s*(>>)
+          captures:
+            1 : punctuation.vhdl
+            2 : storage.type.vhdl
+            3 : keyword.operator.access.end.vhdl
+          pop : true
+        - match: '@|\^'
+          scope: keyword.operator.access.level.vhdl
+        - match: \.
+          scope: punctuation.vhdl
+  tag_pattern:
+    - match: ^\s*({{id}})\s*(:)\s*(?=--|$)
+      captures:
+        1: entity.name.tag.vhdl
+        2: punctuation.vhdl
   if_pattern:
     - match: |-
         (?x)
-                    (
-                      # Optional identifier $2
-                      ([a-zA-Z][a-zA-Z0-9_]*)
-
-                      # Followed by a colon $3
-                      \s*(:)\s*
-                    )?
-
-                    # Keyword if $4
-                    \b((?i:if))\b
-
+          (
+            # Optional identifier $2
+            ({{id}})
+            # Followed by a colon $3
+            \s*(:)\s*
+          )?
+          # Keyword if $4
+          \b((?i:if))\b
       captures:
         2: entity.name.tag.if.generate.begin.vhdl
         3: punctuation.vhdl
@@ -561,32 +577,27 @@ contexts:
         - meta_scope: meta.block.if.vhdl
         - match: |-
             (?x)
-                        # The word end $1
-                        \b((?i:end))\s+
-
-                        (
-                          (
-                            # Optional generate or if keyword $4
-                             ((?i:generate|if))
-
-                            # Keyword if or generate required $5
-                            |(\S+)
-                          )\b
-                          (
-                            \s+
-                            (
-                              # Optional matching identifier $8
-                               (\2)
-
-                              # Mismatched identifier $9
-                              |(.+?)
-                            )
-                          )?
-                        )?
-
-                        # Followed by a semicolon
-                        (?=\s*;)
-
+              # The word end $1
+              \b((?i:end))\s+
+              (
+                (
+                  # Optional generate or if keyword $4
+                   ((?i:generate|if))
+                  # Keyword if or generate required $5
+                  |(\S+)
+                )\b
+                (
+                  \s+
+                  (
+                    # Optional matching identifier $8
+                     (\2)
+                    # Mismatched identifier $9
+                    |(.+?)
+                  )
+                )?
+              )?
+              # Followed by a semicolon
+              (?=\s*;)
           captures:
             1: keyword.language.vhdl
             4: keyword.language.vhdl
@@ -602,11 +613,28 @@ contexts:
         - include: cleanup
   keywords:
     - match: '''(?i:active|ascending|base|delayed|driving|event|high|image|instance|instance_name|last|last_value|left|leftof|length|low|path|path_name|pos|pred|quiet|range|reverse|reverse_range|right|rightof|simple|simple_name|stable|succ|transaction|val|value)\b'
-      scope: keyword.attributes.vhdl
-    - match: \b(?i:abs|access|after|alias|all|and|architecture|array|assert|attribute|begin|block|body|buffer|bus|case|component|configuration|constant|disconnect|downto|else|elsif|end|entity|exit|file|for|function|generate|generic|group|guarded|if|impure|in|inertial|inout|is|label|library|linkage|literal|loop|map|mod|nand|new|next|nor|not|null|of|on|open|or|others|out|package|port|postponed|procedure|process|pure|range|record|register|reject|rem|report|return|rol|ror|select|severity|shared|signal|sla|sll|sra|srl|subtype|then|to|transport|type|unaffected|units|until|use|variable|wait|when|while|with|xnor|xor)\b
+      scope: variable.other.member.vhdl
+    - match: \b(?i:abs|access|after|alias|all|and|architecture|array|assert|attribute|begin|block|body|buffer|bus|case|component|configuration|disconnect|downto|else|elsif|end|entity|exit|file|for|function|generate|generic|group|guarded|if|impure|in|inertial|inout|is|label|library|linkage|literal|loop|map|mod|nand|new|next|nor|not|null|of|on|open|or|others|out|package|port|postponed|procedure|process|pure|range|record|register|reject|rem|report|return|rol|ror|select|severity|shared|signal|sla|sll|sra|srl|subtype|then|to|transport|type|unaffected|units|until|use|variable|wait|when|while|with|xnor|xor)\b
       scope: keyword.language.vhdl
     - match: '(\+|\-|<=|=|=>|:=|>=|>|<|/|\||&|(\*{1,2}))'
       scope: keyword.operator.vhdl
+  library_pattern:
+    - match: \b((?i:library))\s+({{id}})
+      captures:
+        1: keyword.language.vhdl
+        2: support.library.vhdl
+    - match: \b(?i:use)\b
+      scope: keyword.language.vhdl
+      push:
+        - match: \b(?i:all)\b
+          scope: keyword.language.vhdl
+        - match: \.
+          scope: punctuation.vhdl
+        - match: '{{id}}'
+          scope: support.library.vhdl
+        - match: ;
+          scope: punctuation.vhdl
+          pop: true
   package_body_pattern:
     - match: |-
         (?x)
@@ -650,6 +678,8 @@ contexts:
         - include: function_definition_pattern
         - include: procedure_definition_pattern
         - include: type_pattern
+        - include: constant_pattern
+        - include: signal_pattern
         - include: subtype_pattern
         - include: record_pattern
         - include: cleanup
@@ -694,6 +724,8 @@ contexts:
         - include: function_prototype_pattern
         - include: procedure_prototype_pattern
         - include: type_pattern
+        - include: constant_pattern
+        - include: signal_pattern
         - include: subtype_pattern
         - include: record_pattern
         - include: component_pattern
@@ -711,8 +743,71 @@ contexts:
             - meta_scope: meta.list.element.vhdl
             - match: (;|\)|,)
               captures:
-                0: meta.item.stopping.character.vhdl
+                0: meta.item.stopping.character.vhdl punctuation.vhdl
               pop: true
+            - include: comments
+            - include: parenthetical_pair
+            - include: cleanup
+        - match: \)
+          scope: invalid.illegal.unexpected.parenthesis.vhdl
+        - include: cleanup
+  parenthetical_list_portmap:
+    - match: \(
+      captures:
+        0: punctuation.vhdl
+      push:
+        - meta_scope: meta.block.parenthetical_list.portmap.vhdl
+        - match: (?<=\))
+          pop: true
+        - match: '(?=[''"a-zA-Z0-9])'
+          push:
+            - meta_scope: meta.list.element.vhdl
+            - match: (;|\)|,)
+              captures:
+                0: meta.item.stopping.character.vhdl punctuation.vhdl
+              pop: true
+            - match: '({{id}})\s*(?=(\([^\)]+\)\s*)?=>)'
+              captures:
+                1 : variable.parameter.port.vhdl
+            - match: =>
+              scope: keyword.operator.binding.vhdl
+            - include: comments
+            - include: parenthetical_pair
+            - include: cleanup
+        - match: \)
+          scope: invalid.illegal.unexpected.parenthesis.vhdl
+        - include: cleanup
+  parenthetical_list_port:
+    - match: \(
+      captures:
+        0: punctuation.vhdl
+      push:
+        - meta_scope: meta.block.parenthetical_list.port.vhdl
+        - match: (?<=\))
+          pop: true
+        - match: '(?=[''"a-zA-Z0-9])'
+          push:
+            - meta_scope: meta.list.element.vhdl
+            - match: (;|\)|,)
+              captures:
+                0: meta.item.stopping.character.vhdl punctuation.vhdl
+              pop: true
+            - match: '\b({{id}})\s*(:)\s*(in\b|out\b|inout\b)'
+              captures:
+                # 1 : variable.parameter.port.vhdl
+                2 : punctuation.vhdl
+                3 : keyword.language.direction.vhdl
+              push:
+                - meta_scope: meta.list.port.vhdl
+                - match: (?=;|\)|,)
+                  pop: true
+                - match: '({{id}})\s*(?=;|$|\))'
+                  captures :
+                    1 : storage.type.userdefined.vhdl
+                  pop: true
+                - include: comments
+                - include: parenthetical_pair
+                - include: cleanup
             - include: comments
             - include: parenthetical_pair
             - include: cleanup
@@ -741,7 +836,7 @@ contexts:
           captures:
             0: punctuation.vhdl
           pop: true
-        - include: parenthetical_list
+        - include: parenthetical_list_port
   procedure_definition_pattern:
     - match: |-
         (?x)
@@ -796,13 +891,15 @@ contexts:
         - include: parenthetical_list
         - include: control_patterns
         - include: type_pattern
+        - include: constant_pattern
+        - include: signal_pattern
         - include: record_pattern
         - include: cleanup
   procedure_prototype_pattern:
     - match: |-
         (?x)
           \b((?i:procedure))\s+
-          (([a-zA-Z][a-zA-Z0-9_]*)|(.+?))
+          (({{id}})|(.+?))
           (?=\s*(\(|;))
       captures:
         1: keyword.language.vhdl
@@ -823,7 +920,7 @@ contexts:
 
                     (
                       # Optional identifier $2
-                      ([a-zA-Z][a-zA-Z0-9_]*)
+                      ({{id}})
 
                       # Colon $3
                       \s*(:)\s*
@@ -859,6 +956,50 @@ contexts:
           pop: true
         - include: control_patterns
         - include: cleanup
+  psl:
+    - match: \s*(--)\s*(psl)\s+((\w+)\s*(:))?\s*(default|assert|assume)
+      captures:
+        0: meta.psl.vhdl
+        1: comment.line.double-dash.vhdl
+        2: keyword.psl.vhdl
+        4: entity.name.psl.vhdl
+        5: punctuation.vhdl
+        6: keyword.psl.vhdl
+      push:
+        - meta_scope: meta.psl.vhdl
+        - match: ;
+          pop: true
+        - match: \b(never|always|default|clock|within|rose|fell|stable|until|before|next|eventually|abort|posedge)\b
+          scope: keyword.psl.vhdl
+        - match: '(\+|\-|<=|=|=>|:=|>=|>|<|/|\||&|(\*{1,2}))'
+          scope: keyword.operator.psl.vhdl
+        - include: constants_numeric
+    - match: \s*(/\*)\s*(psl)
+      captures:
+        0: meta.psl.vhdl
+        1: comment.block.vhdl
+        2: keyword.psl.vhdl
+      push:
+        - meta_scope: meta.psl.vhdl
+        - match: (\*/)
+          captures:
+            1: comment.block.vhdl
+          pop: true
+        - match: ^\s*((\w+)\s*(:))?\s*(default|assert|assume)
+          captures:
+            0: meta.psl.vhdl
+            2: entity.name.psl.vhdl
+            3: punctuation.vhdl
+            4: keyword.psl.vhdl
+        - match: \b(property)\s+(\w+)
+          captures:
+            1: keyword.psl.vhdl
+            2: entity.name.psl.vhdl
+        - match: \b(never|always|default|clock|within|rose|fell|stable|until|before|next|eventually|abort|posedge|negedge)\b
+          scope: keyword.psl.vhdl
+        - match: '(\+|\-|<=|=|=>|:=|>=|>|<|/|\||&|(\*{1,2}))'
+          scope: keyword.operator.psl.vhdl
+        - include: constants_numeric
   punctuation:
     - match: (\.|,|:|;|\(|\))
       scope: punctuation.vhdl
@@ -912,7 +1053,7 @@ contexts:
                     \b((?i:subtype))\s+
 
                     # Valid identifier $3 or invalid identifier $4
-                    (([a-zA-Z][a-zA-Z0-9_]*)|(.+?))\s+
+                    (({{id}})|(.+?))\s+
 
                     # The word is $5
                     ((?i:is))\b
@@ -939,11 +1080,11 @@ contexts:
   support_functions:
     - match: \b(?i:finish|stop|resolution_limit)\b
       scope: support.function.std.env.vhdl
-    - match: \b(?i:readline|read|writeline|write|endfile|endline)\b
+    - match: \b(?i:readline|(h|o)?read|writeline|(h|o)?write|endfile|endline|file_(open|close|handle))\b
       scope: support.function.std.textio.vhdl
     - match: \b(?i:rising_edge|falling_edge|to_bit|to_bitvector|to_stdulogic|to_stdlogicvector|to_stdulogicvector|is_x)\b
       scope: support.function.ieee.std_logic_1164.vhdl
-    - match: \b(?i:shift_left|shift_right|rotate_left|rotate_right|resize|to_integer|to_unsigned|to_signed)\b
+    - match: \b(?i:shift_left|shift_right|rotate_left|rotate_right|resize|to_integer|to_unsigned|to_signed|std_match)\b
       scope: support.function.ieee.numeric_std.vhdl
     - match: \b(?i:arccos(h?)|arcsin(h?)|arctan|arctanh|cbrt|ceil|cos|cosh|exp|floor|log10|log2|log|realmax|realmin|round|sign|sin|sinh|sqrt|tan|tanh|trunc)\b
       scope: support.function.ieee.math_real.vhdl
@@ -961,6 +1102,8 @@ contexts:
     - match: \b(?i:complex|complex_polar)\b
       scope: support.type.ieee.math_complex.vhdl
   syntax_highlighting:
+    - include: library_pattern
+    - include: hierarchical_pattern
     - include: keywords
     - include: punctuation
     - include: support_constants
@@ -969,20 +1112,16 @@ contexts:
   type_pattern:
     - match: |-
         (?x)
-                    # The word type $1
-                    \b((?i:type))\s+
-
-                    # Valid identifier $3 or invalid identifier $4
-                    (([a-zA-Z][a-zA-Z0-9_]*)|(.+?))
-
-                    (
-                      # A semicolon is coming up if we are incomplete
-                       (?=\s*;)
-
-                      # Or the word is comes up $7
-                      |(\s+((?i:is)))
-                    )\b
-
+          # The word type $1
+          \b((?i:type))\s+
+          # Valid identifier $3 or invalid identifier $4
+          (({{id}})|(.+?))
+          (
+            # A semicolon is coming up if we are incomplete
+             (?=\s*;)
+            # Or the word is comes up $7
+            |(\s+((?i:is)))
+          )\b
       captures:
         1: keyword.language.vhdl
         3: entity.name.type.type.vhdl
@@ -996,24 +1135,66 @@ contexts:
           pop: true
         - include: record_pattern
         - include: cleanup
+  constant_pattern:
+    - match: |-
+        (?x)
+          # The word type $1
+          \b((?i:constant))\s+
+          # Valid identifier $3 or invalid identifier $4
+          (({{id}})|(.+?))\s*
+          (:)
+      captures:
+        1: keyword.language.vhdl
+        3: entity.name.type.constant.vhdl
+        4: invalid.illegal.invalid.identifier.vhdl
+        5: punctuation.vhdl
+      push:
+        - meta_scope: meta.block.constant.vhdl
+        - match: ;
+          captures:
+            0: punctuation.vhdl
+          pop: true
+        - include: cleanup
+        - match: \b({{id}})\s*(:=)
+          captures:
+            1: storage.type.userdefined.vhdl
+            2: keyword.operator.vhdl
+  signal_pattern:
+    - match: |-
+        (?x)
+          # The word type $1
+          \b((?i:signal|variable))\s+
+          # Valid identifier $3 or invalid identifier $4
+          ((?:({{id}})(?:\s*,\s*{{id}})*)|(.+?))\s*
+          (:)
+      captures:
+        1: keyword.language.vhdl
+        4: invalid.illegal.invalid.identifier.vhdl
+        5: punctuation.vhdl
+      push:
+        - meta_scope: meta.block.signal.vhdl
+        - match: ;
+          captures:
+            0: punctuation.vhdl
+          pop: true
+        - include: cleanup
+        - match: \b({{id}})\b\s*(?=;)
+          scope: storage.type.userdefined.vhdl
   while_pattern:
     - match: |-
         (?x)
-                    # From the beginning of the line
-                    ^\s*
-                    (
-                      # Check for an identifier $2
-                      ([a-zA-Z][a-zA-Z0-9_]*)
-
-                      # Followed by a colon $3
-                      \s*(:)\s*
-                    )?
-
-                    # The for keyword $4
-                    \b((?i:while))\b
-
+          # From the beginning of the line
+          ^\s*
+          (
+            # Check for an identifier $2
+            ({{id}})
+            # Followed by a colon $3
+            \s*(:)\s*
+          )?
+          # The for keyword $4
+          \b((?i:while))\b
       captures:
-        2: ""
+        2: entity.name.tag.while.begin.vhdl
         3: punctuation.vhdl
         4: keyword.language.vhdl
       push:
