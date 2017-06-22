@@ -26,7 +26,7 @@ contexts:
         3: entity.name.type.architecture.begin.vhdl
         4: invalid.illegal.invalid.identifier.vhdl
         5: keyword.language.vhdl
-        7: entity.name.type.entity.reference.vhdl
+        7: entity.name.section.entity.reference.vhdl
         8: invalid.illegal.invalid.identifier.vhdl
       push:
         - meta_scope: meta.block.architecture
@@ -43,7 +43,7 @@ contexts:
           captures:
             1: keyword.language.vhdl
             3: keyword.language.vhdl
-            6: entity.name.type.architecture.end.vhdl
+            6: entity.name.section.architecture.end.vhdl
             7: invalid.illegal.mismatched.identifier.vhdl
           pop: true
         - include: function_definition_pattern
@@ -164,9 +164,9 @@ contexts:
                     (?=\s*($|generic|port))
 
       captures:
-        1: entity.name.section.component_instantiation.vhdl
+        1: entity.name.tag.component_instantiation.vhdl
         2: punctuation.vhdl
-        3: entity.name.tag.component.reference.vhdl
+        3: entity.name.section.component.reference.vhdl
       push:
         - meta_scope: meta.block.component_instantiation.vhdl
         - match: ;
@@ -212,7 +212,7 @@ contexts:
             1: keyword.language.vhdl
             3: keyword.language.vhdl
             4: invalid.illegal.component.keyword.required.vhdl
-            7: entity.name.type.component.end.vhdl
+            7: entity.name.section.component.end.vhdl
             8: invalid.illegal.mismatched.identifier.vhdl
           pop: true
         - include: generic_list_pattern
@@ -285,17 +285,17 @@ contexts:
                     )?
 
       captures:
-        1: entity.name.section.entity_instantiation.vhdl
+        1: entity.name.tag.entity_instantiation.vhdl
         2: punctuation.vhdl
         4: keyword.language.vhdl
         5: keyword.language.vhdl
-        8: entity.name.tag.library.reference.vhdl
+        8: entity.name.section.library.reference.vhdl
         9: invalid.illegal.invalid.identifier.vhdl
         10: punctuation.vhdl
-        12: entity.name.tag.entity.reference.vhdl
+        12: entity.name.section.entity.reference.vhdl
         13: invalid.illegal.invalid.identifier.vhdl
         16: punctuation.vhdl
-        18: entity.name.tag.architecture.reference.vhdl
+        18: entity.name.section.architecture.reference.vhdl
         19: invalid.illegal.invalid.identifier.vhdl
         21: punctuation.vhdl
       push:
@@ -342,7 +342,7 @@ contexts:
           captures:
             1: keyword.language.vhdl
             3: keyword.language.vhdl
-            6: entity.name.type.entity.end.vhdl
+            6: entity.name.section.entity.end.vhdl
             7: invalid.illegal.mismatched.identifier.vhdl
           pop: true
         - include: comments
@@ -438,9 +438,9 @@ contexts:
       captures:
         1: keyword.language.vhdl
         2: keyword.language.vhdl
-        4: entity.name.function.function.begin.vhdl
-        5: entity.name.function.function.begin.vhdl
-        6: entity.name.function.function.begin.vhdl
+        4: entity.name.tag.function.begin.vhdl
+        5: entity.name.tag.function.begin.vhdl
+        6: entity.name.tag.function.begin.vhdl
         7: invalid.illegal.invalid.identifier.vhdl
       push:
         - meta_scope: meta.block.function_definition.vhdl
@@ -464,7 +464,7 @@ contexts:
           captures:
             1: keyword.language.vhdl
             3: keyword.language.vhdl
-            6: entity.name.function.function.end.vhdl
+            6: entity.name.tag.function.end.vhdl
             7: invalid.illegal.mismatched.identifier.vhdl
           pop: true
         - include: control_patterns
@@ -505,9 +505,9 @@ contexts:
 
       captures:
         1: keyword.language.vhdl
-        3: entity.name.function.function.prototype.vhdl
-        4: entity.name.function.function.prototype.vhdl
-        5: entity.name.function.function.prototype.vhdl
+        3: entity.name.tag.function.prototype.vhdl
+        4: entity.name.tag.function.prototype.vhdl
+        5: entity.name.tag.function.prototype.vhdl
         6: invalid.illegal.function.name.vhdl
       push:
         - meta_scope: meta.block.function_prototype.vhdl
@@ -653,7 +653,7 @@ contexts:
       captures:
         1: keyword.language.vhdl
         2: keyword.language.vhdl
-        4: entity.name.section.package_body.begin.vhdl
+        4: entity.name.type.package_body.begin.vhdl
         5: invalid.illegal.invalid.identifier.vhdl
         6: keyword.language.vhdl
       push:
@@ -700,7 +700,7 @@ contexts:
 
       captures:
         1: keyword.language.vhdl
-        3: entity.name.section.package.begin.vhdl
+        3: entity.name.type.package.begin.vhdl
         4: invalid.illegal.invalid.identifier.vhdl
         5: keyword.language.vhdl
       push:
@@ -860,8 +860,8 @@ contexts:
 
       captures:
         1: keyword.language.vhdl
-        3: entity.name.function.procedure.begin.vhdl
-        4: entity.name.function.procedure.begin.vhdl
+        3: entity.name.tag.procedure.begin.vhdl
+        4: entity.name.tag.procedure.begin.vhdl
         5: invalid.illegal.invalid.identifier.vhdl
       push:
         - meta_scope: meta.block.procedure_definition.vhdl
@@ -885,7 +885,7 @@ contexts:
           captures:
             1: keyword.language.vhdl
             3: keyword.language.vhdl
-            6: entity.name.function.procedure.end.vhdl
+            6: entity.name.tag.procedure.end.vhdl
             7: invalid.illegal.mismatched.identifier.vhdl
           pop: true
         - include: parenthetical_list
@@ -903,7 +903,7 @@ contexts:
           (?=\s*(\(|;))
       captures:
         1: keyword.language.vhdl
-        3: entity.name.function.procedure.begin.vhdl
+        3: entity.name.tag.procedure.begin.vhdl
         4: invalid.illegal.invalid.identifier.vhdl
       push:
         - meta_scope: meta.block.procedure_prototype.vhdl
@@ -930,7 +930,7 @@ contexts:
                     ((?i:process\b))
 
       captures:
-        2: entity.name.section.process.begin.vhdl
+        2: entity.name.tag.process.begin.vhdl
         3: punctuation.vhdl
         4: keyword.language.vhdl
       push:
@@ -951,7 +951,7 @@ contexts:
           captures:
             1: keyword.language.vhdl
             3: keyword.language.vhdl
-            6: entity.name.section.process.end.vhdl
+            6: entity.name.tag.process.end.vhdl
             7: invalid.illegal.invalid.identifier.vhdl
           pop: true
         - include: control_patterns
@@ -1169,6 +1169,7 @@ contexts:
           (:)
       captures:
         1: keyword.language.vhdl
+        3: entity.name.type.signal.vhdl
         4: invalid.illegal.invalid.identifier.vhdl
         5: punctuation.vhdl
       push:
