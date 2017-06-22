@@ -135,13 +135,19 @@ contexts:
         - include: cleanup
   cleanup:
     - include: comments
+    - include: comments_doxy
     - include: constants_numeric
     - include: strings
     - include: attribute_list
     - include: syntax_highlighting
   comments:
-    - match: '--.*$\n?'
+    - match: '--[^!].*$\n?'
       scope: comment.line.double-dash.vhdl
+  comments_doxy:
+    # Doxygen looks for --! comments, the scope can be used to distinguish
+    # normal and doxy commtents.
+    - match: '--!.*$\n?'
+      scope: comment.line.double-dash-bang.vhdl
   component_instantiation_pattern:
     - match: |-
         (?x)
