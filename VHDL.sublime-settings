@@ -1,0 +1,4 @@
+// These settings override both User and Default settings for the VHDL syntax
+{
+  "smart_indent": false
+}
