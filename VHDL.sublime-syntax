@@ -533,7 +533,7 @@ contexts:
           captures:
             0: punctuation.vhdl
           pop: true
-        - include: parenthetical_list
+        - include: parenthetical_list_generic
   hierarchical_pattern:
     - match: (?i)(<<)\s*(signal)\b
       captures:
@@ -792,16 +792,48 @@ contexts:
               pop: true
             - match: '\b({{id}})\s*(:)\s*(in\b|out\b|inout\b)'
               captures:
-                # 1 : variable.parameter.port.vhdl
+                1 : entity.name.type.port.vhdl
                 2 : punctuation.vhdl
                 3 : keyword.language.direction.vhdl
               push:
                 - meta_scope: meta.list.port.vhdl
                 - match: (?=;|\)|,)
                   pop: true
-                - match: '({{id}})\s*(?=;|$|\))'
-                  captures :
-                    1 : storage.type.userdefined.vhdl
+                # - match: '({{id}})\s*(?=;|$|\))'
+                #   captures :
+                #     1 : storage.type.userdefined.vhdl
+                #   pop: true
+                - include: comments
+                - include: parenthetical_pair
+                - include: cleanup
+            - include: comments
+            - include: parenthetical_pair
+            - include: cleanup
+        - match: \)
+          scope: invalid.illegal.unexpected.parenthesis.vhdl
+        - include: cleanup
+  parenthetical_list_generic:
+    - match: \(
+      captures:
+        0: punctuation.vhdl
+      push:
+        - meta_scope: meta.block.parenthetical_list.generic.vhdl
+        - match: (?<=\))
+          pop: true
+        - match: '(?=[''"a-zA-Z0-9])'
+          push:
+            - meta_scope: meta.list.element.vhdl
+            - match: (;|\)|,)
+              captures:
+                0: meta.item.stopping.character.vhdl punctuation.vhdl
+              pop: true
+            - match: '\b({{id}})\s*(:)'
+              captures:
+                1 : entity.name.type.generic.vhdl
+                2 : punctuation.vhdl
+              push:
+                - meta_scope: meta.list.generic.vhdl
+                - match: (?=;|\)|,)
                   pop: true
                 - include: comments
                 - include: parenthetical_pair
