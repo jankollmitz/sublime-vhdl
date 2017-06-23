@@ -25,10 +25,10 @@
 			</dict>
 		</array>
 		<!-- Indentation -->
-<!-- 		<key>decreaseIndentPattern</key>
-		<string>\s*(end)\b</string>
+		<key>decreaseIndentPattern</key>
+		<string>(\s*\bbegin\b)|\s*\bend\b</string>
 		<key>increaseIndentPattern</key>
-		<string>(.*\bbegin\b)|(^\s*(entity|architecture)\b[^;]*$\b)</string> -->
+		<string>(.*\bbegin\b)|(^\s*(entity|architecture)\b[^;]*$\b)</string>
 
 	</dict>
 </dict>
