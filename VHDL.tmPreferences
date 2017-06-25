@@ -24,11 +24,31 @@
 				<string>--! </string>
 			</dict>
 		</array>
+
 		<!-- Indentation -->
-		<key>decreaseIndentPattern</key>
-		<string>(\s*\bbegin\b)|\s*\bend\b</string>
 		<key>increaseIndentPattern</key>
-		<string>(.*\bbegin\b)|(^\s*(entity|architecture)\b[^;]*$\b)</string>
+		<string>(?x)
+			^ \s* \b(entity|architecture|case)\b .* is \s* $
+			| ^ \s* ([a-zA-z][a-zA-z0-9_]*)? \s* : \s* (?i:process)
+			| ^ \s* \b(generic|port) (\s* map)? \s* \( \s* $
+			| ^ \s* \bbegin\b \s* $
+			| ^ \s* if.*then \s* $
+			| ^ \s* \bels(e\b|if\b.*then) \s* $
+			| ^ \s* \bwhen\b .* => \s*
+			<!-- (.*\b(begin|process)\b)|(^\s*(entity|architecture)\b[^;]*$\b) -->
+		</string>
+
+		<key>decreaseIndentPattern</key>
+		<string>(?x)
+			\s* \bbegin\b
+			| ^ \s* \bels(e\b|if\b.*then) \s* $
+			| ^ \s* \bwhen\b .* => \s*
+			|	^ \s* \bend\b
+			| ^ \s* \);
+		</string>
+
+		<key>indentParens</key>
+		<string>no</string>
 
 	</dict>
 </dict>
