@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>name</key>
+  <string>VHDL Settings</string>
+  <key>scope</key>
+  <string>indentation.dec.vhdl</string>
+  <key>settings</key>
+  <dict>
+    <!-- Indentation -->
+    <key>decreaseIndentPattern</key>
+    <string>.</string>
+
+  </dict>
+</dict>
+</plist>
