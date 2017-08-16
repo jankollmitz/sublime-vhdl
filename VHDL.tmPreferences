@@ -27,14 +27,16 @@
 
 		<!-- Indentation -->
 		<key>increaseIndentPattern</key>
-		<string>(?x)
-			^ \s* \b(entity|architecture|case)\b .* is \s* $
-			| ^ \s* ([a-zA-z][a-zA-z0-9_]*)? \s* : \s* (?i:process)
-			| ^ \s* \b(generic|port) (\s* map)? \s* \( \s* $
+		<string>(?x)(?i:
+			^ \s* \b(entity|architecture|case|component)\b .* is \s* $
+			| ^ \s* ([a-zA-z][a-zA-z0-9_]* \s* :)? \s* (?i:process)
+			| ^ \s* ([a-zA-z][a-zA-z0-9_]* \s* :)? \s* (if|for).*(?i:generate)
+			| ^ \s* \b(generic|port) (\s* map)? \s* \( \s* (?!.*\);?)
 			| ^ \s* \bbegin\b \s* $
 			| ^ \s* if.*then \s* $
 			| ^ \s* \bels(e\b|if\b.*then) \s* $
 			| ^ \s* \bwhen\b .* => \s*
+			)
 			<!-- (.*\b(begin|process)\b)|(^\s*(entity|architecture)\b[^;]*$\b) -->
 		</string>
 
@@ -44,7 +46,7 @@
 			| ^ \s* \bels(e\b|if\b.*then) \s* $
 			| ^ \s* \bwhen\b .* => \s*
 			|	^ \s* \bend\b
-			| ^ \s* \);
+			| ^ \s* \);?
 		</string>
 
 		<key>indentParens</key>

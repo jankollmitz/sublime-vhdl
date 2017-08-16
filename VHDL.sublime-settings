@@ -1,4 +1,6 @@
 // These settings override both User and Default settings for the VHDL syntax
 {
-  "smart_indent": false
+  "smart_indent": false,
+  "auto_indent": true,
+  "better_auto_indent": false
 }
