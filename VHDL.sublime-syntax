@@ -10,6 +10,32 @@ contexts:
   main:
     - include: block_processing
     - include: cleanup
+  assignment_pattern:
+    - match: |-
+        (?x)
+        # From the beginning of the line
+        ^\s*
+        (
+          # Optional identifier $2
+          ({{id}})
+          # Colon $3
+          \s*(:)\s*
+        )?
+        \s*
+        # a varable or signal name without a preceeding if...
+        (?!\s*if)\s*{{id}}(?=.*(<=|:=))
+        # ... eventually followed by := vor variables or <= for signals #4
+      captures:
+        2: entity.name.tag.assignment.vhdl
+        3: punctuation.vhdl
+      push:
+        - meta_scope: meta.block.assignment.vhdl
+        - match: ;
+          scope: punctuation.vhdl indentation.next.-1
+          pop: true
+        - match: (<=|:=)
+          scope: keyword.operator.vhdl indentation.next.+1
+        - include: cleanup
   architecture_pattern:
     - match: |-
         (?x)
@@ -56,6 +82,7 @@ contexts:
         - include: process_pattern
         - include: type_pattern
         - include: declaration_pattern
+        - include: assignment_pattern
         - include: record_pattern
         - include: for_pattern
         - include: entity_instantiation_pattern
@@ -524,6 +551,7 @@ contexts:
   if_pattern:
     - match: |-
         (?x)
+        ^\s*
         (
           # Optional identifier $2
           ({{id}})
@@ -574,6 +602,7 @@ contexts:
         - include: entity_instantiation_pattern
         - include: component_pattern
         - include: component_instantiation_pattern
+        - include: assignment_pattern
         - include: cleanup
   keywords:
     - match: '''(?i:active|ascending|base|delayed|driving|event|high|image|instance|instance_name|last|last_value|left|leftof|length|low|path|path_name|pos|pred|quiet|range|reverse|reverse_range|right|rightof|simple|simple_name|stable|succ|transaction|val|value)\b'
