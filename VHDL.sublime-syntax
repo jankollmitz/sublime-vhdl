@@ -610,48 +610,23 @@ contexts:
       scope: keyword.language.vhdl
     - match: '(\+|\-|<=|=|=>|:=|>=|>|<|/|\||&|(\*{1,2}))'
       scope: keyword.operator.vhdl
-  # library_pattern:
-  #   - match: \b((?i:library))\s+({{id}})
-  #     captures:
-  #       1: keyword.language.vhdl
-  #       2: support.library.vhdl
-  #   - match: \b(?i:use)\b
-  #     scope: keyword.language.vhdl
-  #     push:
-  #       - meta_scope: test.vhdl
-  #       - match: \b(?i:all)\b
-  #         scope: keyword.language.vhdl
-  #       - match: \.
-  #         scope: punctuation.vhdl
-  #       - match: '{{id}}'
-  #         scope: support.library.vhdl
-  #       - match: ;
-  #         scope: punctuation.vhdl
-  #         pop: true
   library_pattern:
-    - match: \b((?i:library))\s+({{id}})\s*(;)\s*$
+    - match: \b((?i:library))\s+({{id}})
       captures:
         1: keyword.language.vhdl
         2: support.library.vhdl
-        3: punctuation.vhdl
+    - match: \b(?i:use)\b
+      scope: keyword.language.vhdl
       push:
-        - meta_content_scope: meta.block.library_use.vhdl
-        - match: \b(?i:use)\b
+        - match: \b(?i:all)\b
           scope: keyword.language.vhdl
-          push:
-            - match: \b(?i:all)\b
-              scope: keyword.language.vhdl
-            - match: \.
-              scope: punctuation.vhdl
-            - match: '{{id}}'
-              scope: support.library.vhdl
-            - match: ;
-              scope: punctuation.vhdl
-              pop: true
-        # match next empty line or next library to end scope
-        - match: ^\s+$|^(?=\s*\b((?i:library))\b)
+        - match: \.
+          scope: punctuation.vhdl
+        - match: '{{id}}'
+          scope: support.library.vhdl
+        - match: ;
+          scope: punctuation.vhdl
           pop: true
-        - include: comments
   package_body_pattern:
     - match: |-
         (?x)
