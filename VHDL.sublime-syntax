@@ -976,6 +976,7 @@ contexts:
         - include: parenthetical_list
         - include: begin_pattern
         - include: control_patterns
+        - include: declaration_pattern
         - include: cleanup
   psl:
     - match: \s*(--)\s*(psl)\s+((\w+)\s*(:))?\s*(default|assert|assume)
@@ -1027,25 +1028,21 @@ contexts:
   record_pattern:
     - match: \b(?i:record)\b
       captures:
-        0: keyword.language.vhdl
+        0: keyword.language.vhdl indentation.next.+1
       push:
         - meta_scope: meta.block.record.vhdl
         - match: |-
             (?x)
-                        # The word end $1
-                        \b((?i:end))
-
-                        # The word record $2
-                        \s+((?i:record))
-
-                        # Optional identifier $5 or invalid identifier $6
-                        (\s+(({{id}})|(.*?)))?
-
-                        # Only whitespace and semicolons can be left
-                        (?=\s*;)
-
+            # The word end $1
+            \b((?i:end))
+            # The word record $2
+            \s+((?i:record))
+            # Optional identifier $5 or invalid identifier $6
+            (\s+(({{id}})|(.*?)))?
+            # Only whitespace and semicolons can be left
+            (?=\s*;)
           captures:
-            1: keyword.language.vhdl
+            1: keyword.language.vhdl indentation.-1
             2: keyword.language.vhdl
             5: entity.name.type.record.vhdl
             6: invalid.illegal.invalid.identifier.vhdl
@@ -1147,14 +1144,14 @@ contexts:
         1: keyword.language.vhdl
         3: entity.name.type.type.vhdl
         4: invalid.illegal.invalid.identifier.vhdl
-        7: keyword.language.vhdl
+        7: keyword.language.vhdl indentation.next.+1
       push:
         - meta_scope: meta.block.type.vhdl
         - match: ;
           captures:
-            0: punctuation.vhdl
+            0: punctuation.vhdl indentation.next.-1
           pop: true
-        - include: parenthetical_list
+        # - include: parenthetical_list
         - include: record_pattern
         - include: cleanup
   # constant_pattern:
