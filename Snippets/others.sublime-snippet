@@ -1,0 +1,6 @@
+<snippet>
+  <tabTrigger>oth</tabTrigger>
+  <scope>source.vhdl</scope>
+  <content>others => ${1:'0'}$0</content>
+  <description>architecture</description>
+</snippet>

@@ -1,6 +1,6 @@
 <snippet>
   <content><![CDATA[
-std_logic_vector(${1:x} downto 0)
+std_logic_vector(${1:x} - 1 downto 0)
 ]]></content>
   <!-- Optional: Set a tabTrigger to define how to trigger the snippet -->
   <tabTrigger>slv</tabTrigger>
